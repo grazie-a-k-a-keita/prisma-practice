@@ -1,0 +1,36 @@
+{
+  "name": "Prisma Practice",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/shyim/devcontainers-features/bun:0": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "[prisma]": {
+          "editor.defaultFormatter": "Prisma.prisma"
+        }
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "christian-kohler.path-intellisense",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "streetsidesoftware.code-spell-checker",
+        "sleistner.vscode-fileutils",
+        "Prisma.prisma"
+      ]
+    }
+  }
+}
