@@ -1,14 +1,13 @@
 import { PrismaClient } from "@/generated/prisma";
-import Fastify from "fastify";
 import jwt from "@fastify/jwt";
+import Fastify from "fastify";
 import routes from "./routes";
-import type { IHeaders, IQuerystring, IReply } from "./types";
 
 const prisma = new PrismaClient();
 
 const fastify = Fastify({ logger: true });
 
-fastify.register(jwt, { secret: "supersecret" });
+fastify.register(jwt, { secret: "supersecret", sign: { expiresIn: "10m" } });
 fastify.register(routes.users, { prefix: "users" });
 fastify.register(routes.posts, { prefix: "posts" });
 
