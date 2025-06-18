@@ -22,3 +22,9 @@ bunx prisma db seed
 # データベースをリセット（開発のみ）
 npx prisma migrate reset
 ```
+
+### jwt
+
+```
+Bearer { jwtToken }
+```
