@@ -1,19 +1,14 @@
-import type {
-  FastifyInstance,
-  FastifyRegisterOptions,
-  RegisterOptions,
-  FastifyPluginCallback,
-} from "fastify";
-import { PrismaClient, Prisma } from "@/generated/prisma";
+import type { FastifyInstance, FastifyRegisterOptions, RegisterOptions, FastifyPluginCallback } from 'fastify';
+import { PrismaClient, Prisma } from '@/generated/prisma';
 
 const prisma = new PrismaClient();
 
 export const posts: FastifyPluginCallback = (
   fastify: FastifyInstance,
   opts: FastifyRegisterOptions<RegisterOptions>,
-  done: (err?: Error | undefined) => void
+  done: (err?: Error | undefined) => void,
 ) => {
-  fastify.addHook("onRequest", async (request, reply) => {
+  fastify.addHook('onRequest', async (request, reply) => {
     try {
       await request.jwtVerify();
     } catch (err) {
@@ -21,51 +16,48 @@ export const posts: FastifyPluginCallback = (
     }
   });
 
-  // fastify.put<{
-  //   Params: { id: string };
-  //   Body: { title?: string; completed?: boolean };
-  // }>("/:id", async (req, res) => {
-  //   const { id } = req.params;
-  //   const { title, completed } = req.body;
-  //   const task = await prisma.task.update({
-  //     data: {
-  //       title,
-  //       completed,
-  //     },
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  //   res.send(task);
-  // });
+  /**
+   * 投稿を更新する
+   * @route PUT /posts/:id
+   */
+  fastify.put<{
+    Params: { id: string };
+    Body: { title: string; content: string; published: boolean };
+  }>('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { title, content, published } = req.body;
 
-  // fastify.delete<{ Params: { id: string } }>("/:id", async (req, res) => {
-  //   const { id } = req.params;
-  //   const task = await prisma.task.findUnique({
-  //     where: {
-  //       id,
-  //     },
-  //   });
+    const post = await prisma.post.update({
+      data: {
+        title,
+        content,
+        published,
+      },
+      where: {
+        id: Number(id),
+      },
+    });
 
-  //   if (task === null) {
-  //     res.send({ err: 404 });
-  //     return;
-  //   }
+    res.send(post);
+  });
 
-  //   const { userId } = await req.jwtDecode();
+  /**
+   * 自身の指定の投稿を削除する
+   * @route DELETE /posts/:id
+   */
+  fastify.delete<{ Params: { id: string } }>('/:id', async (req, res) => {
+    const { id } = req.params;
 
-  //   if (userId !== task.userId) {
-  //     res.send({ err: 401 });
-  //     return;
-  //   }
+    const post = await prisma.post.findUnique({ where: { id: Number(id) } });
+    if (post === null) return res.code(404).send({ error: 404, message: 'Post not found' });
 
-  //   await prisma.task.delete({
-  //     where: {
-  //       id,
-  //     },
-  //   });
-  //   res.send(task);
-  // });
+    const { userId } = await req.jwtDecode<{ userId: number }>();
+
+    if (userId !== post.authorId) return res.code(401).send({ error: 401, message: 'Unauthorized' });
+
+    await prisma.post.delete({ where: { id: Number(id) } });
+    res.send(post);
+  });
 
   done();
 };

@@ -18,4 +18,7 @@ bunx prisma migrate dev --name init
 
 # シード
 bunx prisma db seed
+
+# データベースをリセット（開発のみ）
+npx prisma migrate reset
 ```
